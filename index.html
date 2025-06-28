@@ -1,0 +1,54 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Chart VAULT - IDR</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #111;
+      color: #fff;
+    }
+    #price {
+      font-size: 28px;
+      margin: 20px;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chart VAULT / USDC (Raydium)</h1>
+  <div id="price">Harga IDR: Memuat...</div>
+
+  <!-- Live Chart dari Dexscreener -->
+  <iframe src="https://dexscreener.com/solana/68JeGpcRoU4P1e6q3yzoAusdfBnbzkw3JFMq6UDTpump"></iframe>
+
+  <script>
+    async function updatePrice() {
+      try {
+        const dexRes = await fetch("https://api.dexscreener.com/latest/dex/pairs/solana/68JeGpcRoU4P1e6q3yzoAusdfBnbzkw3JFMq6UDTpump");
+        const dexData = await dexRes.json();
+        const priceUsd = parseFloat(dexData.pair.priceUsd);
+
+        const cgRes = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=idr");
+        const cgData = await cgRes.json();
+        const usdtToIdr = cgData.tether.idr;
+
+        const priceIdr = priceUsd * usdtToIdr;
+        document.getElementById("price").innerText = "Harga IDR: Rp " + priceIdr.toLocaleString("id-ID", { maximumFractionDigits: 4 });
+      } catch (e) {
+        document.getElementById("price").innerText = "Gagal memuat harga IDR.";
+      }
+    }
+
+    updatePrice();
+    setInterval(updatePrice, 30000); // Update setiap 30 detik
+  </script>
+</body>
+</html>
